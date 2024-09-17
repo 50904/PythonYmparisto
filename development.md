@@ -9,4 +9,4 @@ Development-haarasta luodaan sovellukset eri toiminnoille (features) omat haarat
 |---|---|---|
 dev-app | app.py | Joonatan Paijo 
 dev-video | video.py | Kalle
-dev-audio | audio.py | Pekka
+dev-sound | sound.py | Pekka
