@@ -5,7 +5,7 @@ Tähän haaraan ei tehdä suoraan ohjelmakoodia, vaan jokaisella uudella ominais
 ## Toimintojen haarat
 Development-haarasta luodaan sovellukset eri toiminnoille (features) omat haarat. Haarat ja niihin liittyvät tiedostot ilmenevät seuraavasta taulukosta.
 
-| Haara | Moduli(t) | Tekijä |
+| Haara | Moduuli(t) | Tekijä |
 |---|---|---|
 dev-app | app.py | Joonatan Paijo 
 dev-video | video.py | Kalle
