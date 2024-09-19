@@ -14,7 +14,7 @@ def webstream(camIx):
     """Opens a video stream and shows the frames in a window
 
     Args:
-        canIx (_type_): Index of the camera starting from 0
+        camIx (_type_): Index of the camera starting from 0
     """
 
     # Määritellään kameraikkunan nimi
