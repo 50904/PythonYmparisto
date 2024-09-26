@@ -15,4 +15,10 @@ def test_opiskelijanumeroOk_7():
     assert identityCheck.opiskelijanumeroOk('1234567') == False   
 
 def test_opiskelijanumeroOk_kirjain():
-    assert identityCheck.opiskelijanumeroOk('12X45') == False   
+    assert identityCheck.opiskelijanumeroOk('12X45') == False
+
+def test_opiskelijanumeroOk_desimaali():
+    assert identityCheck.opiskelijanumeroOk('12.45') == False
+
+def test_opiskelijanumeroOk_desimaali():
+    assert identityCheck.opiskelijanumeroOk('12,45') == False
