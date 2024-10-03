@@ -37,5 +37,41 @@ def opiskelijanumeroOk(opiskelijanumero: str) -> bool:
 
 # Lopullisena tavoitteena on funktio, joka tarkistaa henkilötunnuksen oikeellisuuden ja
 
-def checkHetu(Hetu):
-    pass
+def checkHetu(hetu):
+
+    # Oletustulos 0 OK jos kaikki on kunnossa
+    result = (0, 'OK')
+
+    # Lasketaan Hetu-parametrin pituus
+    lenght = len(hetu)
+
+    # Jos pituus oikea tehdään eri osat 
+    if lenght == 11:
+        dayPart = hetu[0:2]
+        monthPart = hetu[2:4]
+        yearPart = hetu[4:6]
+        centuryPart = hetu[6:7]
+        numberPart = hetu[7:10] 
+        checksum = hetu[10]
+        # Tarkistetaan päiväosan oikeellisuus
+        if dayPart.isdigit():
+            day = int(dayPart)
+             
+            # Päivän pitää olla väliltä 1 - 31
+            if day < 1:
+                result = (3, "Päivä virheellinen") 
+            if day > 31:
+                 result = (3, "Päivä virheellinen") 
+        else: 
+            # Jos muuta kuin pelkkiä numeroita
+            result = (3, "Päivä virheellinen")
+
+    if lenght < 11: 
+        result = (1, 'Henkiötunnus liian lyhyt')
+
+    if lenght > 11:
+        result = (2, 'Henkilötunnus liian pitkä')
+
+   
+    return result
+
