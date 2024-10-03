@@ -25,18 +25,38 @@ def test_opiskelijanumeroOk_desimaali2():
     assert identityCheck.opiskelijanumeroOk('12,45') == False
 
 # TDD-testausta
-def test_checkHetu():
-    assert identityCheck.checkHetu('130728-478N') == (O, 'OK')
+# -------------
 
-def test_checkHetuDhort():
+# Henkilötunnus on oikein muodostettu, ei virhettä
+
+def test_checkHetuOK():
+    assert identityCheck.checkHetu('130728-478N') == (0, 'OK')
+
+# Hebkiltunnuksessa pitää olla 11 merkkiä, merkkejä on liikaa
+def test_checkHetuShort():
     assert identityCheck.checkHetu('13028-478N') == (1, 'Henkiötunnus liian lyhyt')
 
+# Henkilötunnuksen päiväosassa saa olla 01 - 31
 def test_checkHetuLong():
     assert identityCheck.checkHetu('1307288-478N') == (2, 'Henkilötunnus liian pitkä')
 
-def test:checkHetuDays():
-    assert identityCheck.checkHetu('450728-478N') == (3. 'Päivä virheellinen')
+# Henkilötunnuksen kuukausosassa saa olla 01 - 12
+def test_checkHetuDays():
+    assert identityCheck.checkHetu('450728-478N') == (3, 'Päivä virheellinen')
 
-def test:checkHetuDays():
-    assert identityCheck.checkHetu('132728-478N') == (4. 'Kuukausi virheellinen')
+def test_checkHetuMonths():
+    assert identityCheck.checkHetu('132728-478N') == (4, 'Kuukausi virheellinen')
+
+def test_checkHetuYears():
+    assert identityCheck.checkHetu('13072x-478N') == (5, "Vuosi virheellinen")
+
+# Käytössä olevat vuosisatakoodit + (1800), - (1900) ja A (2000)
+def test_checkHetuCenturyCode():
+    assert identityCheck.checkHetu('130728S478n') == (6, 'Vuosisatakoodi virheellinen')
+
+# Henkilötunnuksen numeroista tehdään luku, esim 1307288478 ja jaetaan se luvulla 31. Jakojäännös on tarkiste. Jos se on alle 10, käytetään numeroa, jos yli haetaan taulukosta vastaava kirjainmerkki 10 -> A, 11 -> B G ja I eivät ole käytössä
+def test_checkHetuModulo():
+    assert identityCheck.checkHetu('130728-478M') == (7, 'Varmistussumma ei täsmää')
+
+
 

@@ -147,7 +147,9 @@ if __name__  == "__main__":
     }
 
     validCenturyCodes = list(centuryCodes.keys())
-    print(validCenturyCodes)
+    validCC = [*centuryCodes.keys()]
+    print('Hassu tapa', validCC)
+    print('Listafunktiolla', validCenturyCodes)
 
     # Haetaan vuosisata avaimen perusteella
     print('Vuosisatakoodi - on ',centuryCodes['-'])
