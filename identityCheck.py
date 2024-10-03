@@ -34,3 +34,8 @@ def opiskelijanumeroOk(opiskelijanumero: str) -> bool:
 # 2. Syntymäaikaosan oikeellisuus
 # 3. Vuosisatakoodit +, - JA A
 # 4. Modulo 31 tarkistus
+
+# Lopullisena tavoitteena on funktio, joka tarkistaa henkilötunnuksen oikeellisuuden ja
+
+def checkHetu(Hetu):
+    pass
