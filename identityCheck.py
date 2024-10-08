@@ -11,7 +11,9 @@
 # --------
 
 # Opiskelijatunnukset oikea muoto
-def opiskelijanumeroOk(opiskelijanumero: str) -> bool: 
+
+
+def opiskelijanumeroOk(opiskelijanumero: str) -> bool:
     """Checks if student number is 5 or 6 digits and does not contain any characters other than numerics
 
     Args:
@@ -24,8 +26,8 @@ def opiskelijanumeroOk(opiskelijanumero: str) -> bool:
     pituus = len(opiskelijanumero)
     if pituus == 5 or pituus == 6:
         if opiskelijanumero.isdigit():
-            result = True 
-    return  result
+            result = True
+    return result
 
 
 # Henkilötunnus esimerkki 130728-478N testataan
@@ -42,17 +44,27 @@ def checkHetu(hetu):
     result = (0, 'OK')
 
     # Vuosisatakoodien sanakirja
-    centurCodes = {
+    centuryCodes = {
         '+': 1800,
         '-': 1900,
         'A': 2000
     }
 
-    validCenturyCodes = centurCodes.keys()
+    validCenturyCodes = centuryCodes.keys()
 
     # Sanakirja jossa on jakojäännösten kirjaintunnukset
     modulusSymbols = {
-        10: 'A', 
+        0: '0',
+        1: '1',
+        2: '2',
+        3: '3',
+        4: '4',
+        5: '5',
+        6: '6',
+        7: '7',
+        8: '8',
+        9: '9',
+        10: 'A',
         11: 'B',
         12: 'C',
         13: 'D',
@@ -78,27 +90,43 @@ def checkHetu(hetu):
     # Lasketaan Hetu-parametrin pituus
     lenght = len(hetu)
 
-    # Jos pituus oikea tehdään eri osat 
+    # Jos pituus oikea tehdään eri osat
     if lenght == 11:
         dayPart = hetu[0:2]
         monthPart = hetu[2:4]
         yearPart = hetu[4:6]
         centuryPart = hetu[6:7]
-        numberPart = hetu[7:10] 
+        numberPart = hetu[7:10]
         checksum = hetu[10]
-        # Tarkistetaan päiväosan oikeellisuus
+
+        # Tarkistetaan päiväosan oikeellisuus, pitää olla pelkkiä numeroita
+        partsCombined = dayPart + monthPart + yearPart + numberPart 
+   
+        if partsCombined.isdigit():
+            checkSumCalculated = int(partsCombined)%31
+            if checksum != modulusSymbols[checkSumCalculated]:
+                result = (7, 'Varmistussumma ei täsmää')
+
+                
+        try: 
+            position = list(validCenturyCodes).index(centuryPart)
+        except:
+            result = (6, 'Vuosisatakoodi virheellinen')
+        # YKSIKKÖTESTIT MODUULEILLE identityCheck.py
+            
+
         if dayPart.isdigit():
             day = int(dayPart)
-             
+
             # Päivän pitää olla väliltä 1 - 31
             if day < 1:
-                result = (3, "Päivä virheellinen") 
+                result = (3, "Päivä virheellinen")
             if day > 31:
-                 result = (3, "Päivä virheellinen") 
+                result = (3, "Päivä virheellinen")
         # Jos muuta kuin pelkkiä numeroita
-        else: 
+        else:
             result = (3, "Päivä virheellinen")
-        
+
         # Tarkistetaan kuukausiosan oikeellisuus, pitää olla pelkkiä
         if monthPart.isdigit():
             month = int(monthPart)
@@ -113,31 +141,90 @@ def checkHetu(hetu):
             result = (4, 'Kuukausi virheellinen')
 
         if yearPart.isdigit():
-            year = int(yearPart) 
+            year = int(yearPart)
         else:
             result = (5, "Vuosi virheellinen")
 
-        # TODO: Tähän Try-Except, jolla tarkistetaan vuosisatakoodi
-        
-        # TODO: Tähän modulo 31 tarkistetaan laskenta ja vertaus syötettynä 
-
-    
-
-    if lenght < 11: 
-        result = (1, 'Henkiötunnus liian lyhyt')
+        # Tarkistetaan vuosisatakoodi
+    if lenght < 11:
+        result = (1, 'Henkilötunnus liian lyhyt')
 
     if lenght > 11:
         result = (2, 'Henkilötunnus liian pitkä')
+    
+    return result 
+        
+import identityCheck
 
-   
-    return result
+def test_opiskelijanumeroOk_5():
+    assert identityCheck.opiskelijanumeroOk('12345') == True
+
+def test_opiskelijanumeroOk_6():
+    assert identityCheck.opiskelijanumeroOk('123456') == True
+
+def test_opiskelijanumeroOk_4():
+    assert identityCheck.opiskelijanumeroOk('1234') == False
+
+def test_opiskelijanumeroOk_7():
+    assert identityCheck.opiskelijanumeroOk('1234567') == False   
+
+def test_opiskelijanumeroOk_kirjain():
+    assert identityCheck.opiskelijanumeroOk('12X45') == False
+
+def test_opiskelijanumeroOk_desimaali():
+    assert identityCheck.opiskelijanumeroOk('12.45') == False
+
+# Joukossa desimaalipilkku
+def test_opiskelijanumeroOk_desimaali2():
+    assert identityCheck.opiskelijanumeroOk('12,45') == False
+
+# TDD-testausta
+# -------------
+
+# Henkilötunnus on oikein muodostettu, ei virhettä
+
+def test_checkHetuOK():
+    assert identityCheck.checkHetu('130728-478N') == (0, 'OK')
+
+# Henkilötunnuksessa pitää olla 11 merkkiä, merkkejä on liikaa
+def test_checkHetuShort():
+    assert identityCheck.checkHetu('13028-478N') == (1, 'Henkilötunnus liian lyhyt')
+
+# Henkilötunnuksen päiväosassa saa olla 01 - 31
+def test_checkHetuLong():
+    assert identityCheck.checkHetu('1307288-478N') == (2, 'Henkilötunnus liian pitkä')
+
+# Henkilötunnuksen kuukausosassa saa olla 01 - 12
+def test_checkHetuDays():
+    assert identityCheck.checkHetu('450728-478N') == (3, 'Päivä virheellinen')
+
+def test_checkHetuMonths():
+    assert identityCheck.checkHetu('132728-478N') == (4, 'Kuukausi virheellinen')
+
+def test_checkHetuYears():
+    assert identityCheck.checkHetu('13072x-478N') == (5, "Vuosi virheellinen")
+
+# Käytössä olevat vuosisatakoodit + (1800), - (1900) ja A (2000)
+def test_checkHetuCenturyCode():
+    assert identityCheck.checkHetu('130728S478n') == (6, 'Vuosisatakoodi virheellinen')
 
 
-if __name__  == "__main__":
+        # TODO: Tähän modulo 31 tarkistetaan laskenta ja vertaus syötettynä
+
+
+    
+
+    
+
+# TODO: Poista loput rivit, kun valmista!
+# KOKEILLAAN ERILAISIA VAIHTOEHTOJA
+# ---------------------------------
+if __name__ == "__main__":
     hetu = '130728-478N'
     paivat = hetu[2:0]
-
-
+    kuukaudet = hetu[2:4]
+    # print (paivat)
+    # print (kuukaudet)
 
  # Vuosisatakoodien sanakirja
     centuryCodes = {
@@ -152,7 +239,7 @@ if __name__  == "__main__":
     print('Listafunktiolla', validCenturyCodes)
 
     # Haetaan vuosisata avaimen perusteella
-    print('Vuosisatakoodi - on ',centuryCodes['-'])
+    print('Vuosisatakoodi - on ', centuryCodes['-'])
 
     # Vuosisatakoodien avaimet listana
     print('Sallitut vuosisatakoodit ovat', validCenturyCodes)
@@ -161,18 +248,22 @@ if __name__  == "__main__":
     # print('Vuosisatakoodi * on ',centuryCodes['*'])
 
     # Haetaan indeksinumero listan jäsenelle
-    try: 
-        position = validCenturyCodes.index('*') 
-        print(position)
-    except:
+
+    try:
+        position = validCenturyCodes.index('*')
+    except Exception as e:
+        print('Tapahtui virhe:', e)
+
+    print('Ja tämä tulee virheenkäsittelyn jälkeen näkyviin')
+
+    searchLetter = '+'
+
+    for value in validCenturyCodes:
+        if value == searchLetter:
+            found = True
+            break
+        else: 
+            found = False
+    if found == False:
         print('Ei löytynyt')
 
-
-
-
-
-
-
-
-
-    

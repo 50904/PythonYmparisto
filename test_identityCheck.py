@@ -32,9 +32,9 @@ def test_opiskelijanumeroOk_desimaali2():
 def test_checkHetuOK():
     assert identityCheck.checkHetu('130728-478N') == (0, 'OK')
 
-# Hebkiltunnuksessa pitää olla 11 merkkiä, merkkejä on liikaa
+# Henkilötunnuksessa pitää olla 11 merkkiä, merkkejä on liikaa
 def test_checkHetuShort():
-    assert identityCheck.checkHetu('13028-478N') == (1, 'Henkiötunnus liian lyhyt')
+    assert identityCheck.checkHetu('13028-478N') == (1, 'Henkilötunnus liian lyhyt')
 
 # Henkilötunnuksen päiväosassa saa olla 01 - 31
 def test_checkHetuLong():
