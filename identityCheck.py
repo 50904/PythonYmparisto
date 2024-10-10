@@ -100,6 +100,7 @@ def checkHetu(hetu):
         checksum = hetu[10]
 
         # Tarkistetaan päiväosan oikeellisuus, pitää olla pelkkiä numeroita
+        
         partsCombined = dayPart + monthPart + yearPart + numberPart 
    
         if partsCombined.isdigit():
@@ -107,14 +108,7 @@ def checkHetu(hetu):
             if checksum != modulusSymbols[checkSumCalculated]:
                 result = (7, 'Varmistussumma ei täsmää')
 
-                
-        try: 
-            position = list(validCenturyCodes).index(centuryPart)
-        except:
-            result = (6, 'Vuosisatakoodi virheellinen')
-        # YKSIKKÖTESTIT MODUULEILLE identityCheck.py
-            
-
+  
         if dayPart.isdigit():
             day = int(dayPart)
 
@@ -144,6 +138,13 @@ def checkHetu(hetu):
             year = int(yearPart)
         else:
             result = (5, "Vuosi virheellinen")
+
+                  
+        try: 
+            position = list(validCenturyCodes).index(centuryPart)
+        except:
+            result = (6, 'Vuosisatakoodi virheellinen')
+
 
         # Tarkistetaan vuosisatakoodi
     if lenght < 11:
