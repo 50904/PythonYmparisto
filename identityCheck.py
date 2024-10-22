@@ -103,7 +103,7 @@ def checkHetu(hetu):
         
         partsCombined = dayPart + monthPart + yearPart + numberPart 
    
-        if partsCombined.isdigit():
+        if partsCombined.isdigit(): 
             checkSumCalculated = int(partsCombined)%31
             if checksum != modulusSymbols[checkSumCalculated]:
                 result = (7, 'Varmistussumma ei täsmää')
@@ -144,6 +144,8 @@ def checkHetu(hetu):
             position = list(validCenturyCodes).index(centuryPart)
         except:
             result = (6, 'Vuosisatakoodi virheellinen')
+
+        
 
 
         # Tarkistetaan vuosisatakoodi
