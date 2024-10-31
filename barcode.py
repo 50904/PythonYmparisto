@@ -54,7 +54,6 @@ def calculateCode128BChecksum(text: str) -> int:
     return code128BChecksum
 
 
-# TODO: Tee tämä funktio loppuun ja testaa sitä Notepadissa
 def createCode128B(text: str) -> str:
     """Creates a complete code128B barcode to be printed using Libre Code128  font
 
