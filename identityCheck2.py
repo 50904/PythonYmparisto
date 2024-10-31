@@ -113,6 +113,7 @@ class NationalSSN:
                     'number':  birthNumberPart,
                     'checksum': checksumPart
                     }
+        # Else haaran tarkoitus on estää Pylance-virhe, ei palauta oikeasti mitään, vaan antaa virheilmoituksen, jos HeTu väärän mittainen
         else:
             return {'status': 'error'}
 
@@ -159,7 +160,12 @@ class NationalSSN:
             self.dateOfBirth = isoDate
 
     # Lasketaan ikä nyt täysinä vuosina
-    def calculateAge(self):
+    def calculateAge(self) -> int :
+        """Calculates age in full years from SSN
+        
+        Rerturns
+
+        """
         # Tarkistetaan ennen laskentaa, että henkilötunnus on oikein syötetty
         if self.isValidSsn():  # Tarkistaa onko hetu syötetty oikein
             self.getDateOfBirth()  # Kutsutaan metodia, joka asettaa dateOfBirth ominaisuuden arvon
@@ -175,9 +181,14 @@ class NationalSSN:
 
             # Palautetaan ikä vuosina
             return ageInYears
-    
+        else:
+            return 0 
     # Metodi sukupuolen selvittämiseen sekä number- ja gender-ominaisuuden asettamiseen
-    def getGender(self):
+    def getGender(self) -> None:
+        """Sets the gendre property of the object (in finnish)
+        
+        
+        """
 
         # Tarkistetaan ensin, onko SSN oikein syötetty
         if self.isValidSsn():
@@ -205,12 +216,10 @@ if __name__ == "__main__":
         hetu1 = NationalSSN('130728x478N')
         hetu1.checkSsnLengthOk()
         hetu1.getDateOfBirth()
+        print('On oikean pituinen:', hetu1.checkSsnLengthOk())
+        print('Henkilötunnus on oikein muodostettu', hetu1.isValidSsn())
+        print('HeTun osat ovat: ', hetu1.splitSsn())
+        print('Syntymäaikaosa ISO-muodossa on ', hetu1.dateOfBirth)
     except Exception as e:
         print('Tapahtui virhe:', e)
     
-
-    print('On oikean pituinen:', hetu1.checkSsnLengthOk())
-    print('Henkilötunnus on oikein muodostettu', hetu1.isValidSsn())
-    print('HeTun osat ovat: ', hetu1.splitSsn())
-    print('Syntymäaikaosa ISO-muodossa on ', hetu1.dateOfBirth)
-   
