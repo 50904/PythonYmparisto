@@ -1,44 +1,63 @@
 # PYSIDE6-MALLINE SOVELLUKSEN PÄÄIKKUNAN LUOMISEEN
-# ================================================
+# KÄÄNNETYSTÄ KÄYTTÖLIITTYMÄTIEDOSTOSTA (mainWindow_ui.py)
+# =====================================================
 
 # KIRJASTOJEN JA MODUULIEN LATAUKSET
 # ----------------------------------
-import os # Tarvitaan mm. hakemistopolkujen käsittelyyn
-import sys # Tarvitaan sovelluksen arqumenttien käsittelyyn
-from PySide6 import QtCore, QtGui, QtWidgets # Tärkeimmät Qt:n moduulit
-from PySide6.QtUiTools import QUiLoader # Tarvitaan käyttöliittymätiedoston lataaminen
+import os # Polkumääritykset
+import sys # Käynnistysargumentit
 
-# KÄYTTÖLIITTYMÄN LUOMINEN
-# ------------------------
+from PySide6 import QtWidgets # Qt-vimpaimet
+from mainWindow_ui import Ui_MainWindow # Käännetyn käyttöliittymän luokka
 
-# Luodaan käyttöliittymätiedoston lataajaobjekti QUiLoader-luokasta
-loader = QUiLoader()
+# Määritellään luokka joka perii QMainWindow- ja Ui_
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    """A class for creating main window for the application"""
 
-# Määritellään sovellusobjekti
+    # Määritellään oliomuodostin ja kutsutaan yliluokkien muodostimia
+    def __init__(self):
+        super().__init__()
+
+
+        # Luodaan käyttöliittymä konvertoidun tiedoston perusteella MainWindown:n ui-ominaisuudeksi.
+        # Tämä suojaa lopun MainWindow-olion ylikirjoitukselta, kun ui-tiedostoa päivitetään
+        self.ui = Ui_MainWindow()
+
+        # Kutsutaan käyttöliittymän muodostusmetodia setupUi
+        self.ui.setupUi(self)
+
+        # OHJELMOIDUT SIGNAALIT
+        # ---------------------
+
+        # Kun Tulosta painiketta on klikattu, kutsutaan updatePrintedLabel-metodia 
+        self.ui.tulostaPushButton.clicked.connect(self.updatePrintedLabel)
+        self.ui.varoitaPushButton.clicked.connect(self.openWarning)
+
+
+
+    # Muutetaan tulostettuLabel:n sisältö: teksti ja väri
+    def updatePrintedLabel(self):
+        self.ui.tulostettuLabel.setText('Tulostettu')
+        self.ui.tulostettuLabel.setStyleSheet(u"color: rgb(0, 255, 0)")
+
+    # Avataan MessageBox
+    def openWarning(self):
+        msgBox = QtWidgets.QMessageBox()
+        msgBox.setIcon(QtWidgets.QMessageBox.Critical)
+        msgBox.setWindowTitle('Hirveetä!')
+        msgBox.setText('Jotain kamalaa tapahtui')
+        msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        msgBox.exec()
+
+# Luodaan sovellus
 app = QtWidgets.QApplication(sys.argv)
 
-# Luodaan pääikkunan objekti ui-tiedoston perusteella, pääikkunalla ei ole isäntäobjektia
-window = loader.load("mainWindow.ui", None)
-
-# Asetetaan pääikkunan nimi
-window.setWindowTitle('TÄMÄ ON PÄÄIKKUNA')
-
-# Luodaan osoitin (pointer), joka viittaa käyttöliittymän elementtiin label
-label = window.findChild(QtWidgets.QLabel, 'label')
-
-
-# Muutetaan label-elementtin sisältö
-# Luodaan osoitin sovelluksen tilariville 
-statusBar = window.findChild(QtWidgets.QStatusBar, 'statusbar')
-
-# Kirjoitetaan teksti tilariville ja pidetään se näkyvissä koko ajan (-1)
-
-statusBar.showMessage('Kaikki hyvin', -1)
-label.setText('Muutettu tekstiä')
-
-# Määritellään ikkuna näkyväksi, oletuksena kaikki ikkunat ovat piilotettuja
+# Luodaan objekti pääikkunalle ja tehdään siitä näkyvä
+window = MainWindow()
 window.show()
 
-# Ajetaan sovellus, tämä luo tapahtumakäsittelyn (event loop)
-# Python 2 sovelluksissa komento on app.exec_(), tuettu edelleen
+# Käynnistetään sovellus ja tapahtumienkäsittelijä
 app.exec()
+
+
+    
