@@ -29,6 +29,8 @@ class NationalSSN:
         self.dateOfBirth = ''
         self.number = 0
         self.gender = ''
+        self.correctLenght = False
+        self.errorMessage = 'OK'
 
         # Sanakirjat vuosisatakoodeille ja varmisteille
         self.centuryCodes = {
@@ -84,9 +86,11 @@ class NationalSSN:
 
             # Generoidaan virhetilanne, jos liian lyhyt tai liian pitkä
             if ssnLength > 11:
-                raise ValueError('Henkilötunnuksessa ylimääräisiä merkkejä')
+                self.errorMessage = 'Henkilötunnuksessa ylimääräisiä merkkejä'
+                raise ValueError(self.errorMessage)
             else:
-                raise ValueError('Henkilötunnuksesta puuttuu merkkejä')
+                self.errorMessage = 'Henkilötunnuksesta puuttuu merkkejä'
+                raise ValueError(self.errorMessage)
             
         else:
             return True
@@ -113,8 +117,9 @@ class NationalSSN:
                     'number':  birthNumberPart,
                     'checksum': checksumPart
                     }
-        # Else haaran tarkoitus on estää Pylance-virhe, ei palauta oikeasti mitään, vaan antaa virheilmoituksen, jos HeTu väärän mittainen
+        # Else haaran tarkoitus on vain estää PyLance-virhe. Ei palauta oikeasti mitään, vaan antaa virheilmoituksen, jos HeTu väärän mittainen
         else:
+            self.errorMessage = 'Virhe henkilötunnuksessa'
             return {'status': 'error'}
 
     
@@ -127,7 +132,14 @@ class NationalSSN:
         Returns:
             bool: True if SSN is valid, False otherwise
         """
-        if self.checkSsnLengthOk:
+        
+        # Otetaan talteen mahdollinen virheilmoitus
+        try:
+            self.correctLenght = self.checkSsnLengthOk()
+        except Exception as e:
+            self.errorMessage = str(e)
+
+        if self.correctLenght == True:
             parts = self.splitSsn()
             moduloString = parts['days'] + parts['months'] + \
                 parts['years'] + parts['number']
@@ -137,9 +149,11 @@ class NationalSSN:
             if checkSumCalculatedSymbol == parts['checksum']:
                 return True
             else:
+                self.errorMessage = 'Syötetty henkilötunnus ei vastaa varmistussummaa'
                 return False
         else:
             return False
+   
     # Muutetaan synytmäaikaosa ja vuosisata päivämääräksi
     def getDateOfBirth(self) -> None:
         """Sets the value of dateOfBirth property for object
@@ -162,9 +176,9 @@ class NationalSSN:
     # Lasketaan ikä nyt täysinä vuosina
     def calculateAge(self) -> int :
         """Calculates age in full years from SSN
-        
-        Rerturns
 
+        Returns:
+            int: age in years
         """
         # Tarkistetaan ennen laskentaa, että henkilötunnus on oikein syötetty
         if self.isValidSsn():  # Tarkistaa onko hetu syötetty oikein
@@ -182,14 +196,12 @@ class NationalSSN:
             # Palautetaan ikä vuosina
             return ageInYears
         else:
-            return 0 
+            return 0
+        
     # Metodi sukupuolen selvittämiseen sekä number- ja gender-ominaisuuden asettamiseen
     def getGender(self) -> None:
-        """Sets the gendre property of the object (in finnish)
-        
-        
+        """Sets the gender property of the object (in finnish)
         """
-
         # Tarkistetaan ensin, onko SSN oikein syötetty
         if self.isValidSsn():
 
@@ -223,3 +235,6 @@ if __name__ == "__main__":
     except Exception as e:
         print('Tapahtui virhe:', e)
     
+
+    
+   

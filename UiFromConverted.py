@@ -31,9 +31,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Kun Tulosta painiketta on klikattu, kutsutaan updatePrintedLabel-metodia 
         self.ui.tulostaPushButton.clicked.connect(self.updatePrintedLabel)
+        
+        # Kun Vaara-painikkeita on klikattu, kutsutaan openWarning-metodia
         self.ui.varoitaPushButton.clicked.connect(self.openWarning)
-
-
+        
+        # OHJELMOIDUT SLOTIT
+        # ------------------
 
     # Muutetaan tulostettuLabel:n sisältö: teksti ja väri
     def updatePrintedLabel(self):
