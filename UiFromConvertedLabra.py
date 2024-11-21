@@ -29,76 +29,78 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ui.setupUi(self)
         self.ui.PrintPushButton.setEnabled(False)
 
-    
         # OHJELMOIDUT SIGNAALIT
         # ---------------------
         
         # Kun poistutaan ssnLineEdit-elementistä suoritetaan barcodeLabel-elementin päivitys
         self.ui.ssnLineEdit.editingFinished.connect(self.updateBarcodeLabel)
-   
-        # Siistitään etunimi- ja sukunimielementit poistuttaessa
-        self.ui.firstNameLineEdit.editingFinished.connect(self.beautifyFirstName)
 
-        # Tehdään siistiminen välittäjämetodin avulla
-        # self.ui.lastNameLineEdit.editingFinished.connect(self.interMediaSlot)
+        # Siistitään etunimi- ja sukunimielementit poistuttaessa:
+        self.ui.firstNameLineEdit.editingFinished.connect(lambda: self.beautifyElement(self.ui.firstNameLineEdit))
         self.ui.lastNameLineEdit.editingFinished.connect(lambda: self.beautifyElement(self.ui.lastNameLineEdit))
-
-        # Aktivoidaan tulostuspainike sen jälkeen kun etikettien määrä on valittu
+        
+        # Aktivoidaan tulostupainike sen jälkeen kun etikettien määrä on valittu
         self.ui.amountSpinBox.valueChanged.connect(self.enablePrintButton)
+   
     # OHJELMOIDUT SLOTIT
     # ------------------
-
+    # TODO: Tee DocStringit metodeille
     # Viivakoodin muodostus ja barcodeLabel:n päivitys
     def updateBarcodeLabel(self):
+        """Updates the barcode label and sets ssnLineEdit to upper case
+
+        """
         # Tarkistetaan, että henkilötunnus on oikein muodostettu
         uiSsn = self.ui.ssnLineEdit.text().upper() # Luetaan käyttöliittymästä henkilötunnus
-        print(uiSsn)
         ssnToCheck = identityCheck2.NationalSSN(uiSsn) # Luodaan henkilötunnusobjekti
         self.ui.ssnLineEdit.setText(uiSsn) # Päivitetään myös syöttökenttä isoihin kirjaimiin
 
-        
-        # Jos se on oikein, luodaan viivakoodi
+        # Jos se on oikein, luodaan viivakoodi ja päivitetään tilariviä
         if ssnToCheck.isValidSsn():
             barcode128 = barcode.Code128B(uiSsn) # Luodaan viivakoodi-olio
             barCodeToPrint = barcode128.buildBarcode() # Lisätään alku- ja loppumerkki sekä varmistussumma
             self.ui.barcodeLabel.setText(barCodeToPrint) # Päivitetään käyttöliittymän 
-        
-        
+            age = ssnToCheck.calculateAge() # Lasketaan ikä
+            ssnToCheck.getGender() # kutsutaan sukupuolen selvitys metodia
+            gender = ssnToCheck.gender.lower() # Luetaan ikä-ominaisuuden arvo oliosta
+            textToShow = f'Asiakas on {age} vuotias {gender}'
+            timeToShow = 10000
+            self.updateStatusbar(textToShow, timeToShow)
         # Jos se muodostettu väärin näytetään virheilmoitus MessageBox-ikkunassa
         else:
             self.errorTitle = 'Henkilötunnus virheellinen'
             self.errorText = ssnToCheck.errorMessage
-            self.ui.ssnLineEdit.setFocus()
             self.openErrorMsgBox(self.errorTitle, self.errorText)
-    
-    
-    # Siistitään etunimi muuttamalla alkukirjaimet isoiksi ja poistamalla ylim. välit
-    def beautifyFirstName(self): 
-        elementText = self.ui.firstNameLineEdit.text()
-        print(elementText)
-        elementText = elementText.strip() # Poistetaan ylimääräiset välit tms.
+            self.ui.ssnLineEdit.setFocus() # Palautetaan kursori takaisin elementtiin
+            
+    # Yleispätevä elementin siistimismetodi, varsinainen metodi, jota interMediateSlot tai lambda kutsuu
+    def beautifyElement(self, element):
+        """Beautifies contents of an element
+
+        Args:
+            element (QtWidger): The element to be beutified
+        """
+        elementText = element.text() # Luetaan elementin teksti
+        elementText = elementText.strip() # Poistetaan välit alusta ja lopusta
         elementText = elementText.title() # Muutetaan isot alkukirjaimet
-        self.ui.firstNameLineEdit.setText(elementText) # Päivitetään elementti
-
-    def interMediaSlot(self):
-        element = self.ui.lastNameLineEdit
-        self.beautifyElement(element)
-
-     # Siistitään etunimi muuttamalla alkukirjaimet isoiksi ja poistamalla ylim. välit
-    def beautifyLastName(self): 
-        elementText = self.ui.lastNameLineEdit.text()
-        elementText = elementText.strip() # Poistetaan ylimääräiset välit tms.
-        elementText = elementText.title() # Muutetaan isot alkukirjaimet
-        self.ui.lastNameLineEdit.setText(elementText) # Päivitetään elementti
-
-
-        # Aktivoidaan tulospainike
+        element.setText(elementText) # Päivitetään elementin teksti
+    
+    # Aktivoidaan tulostuspainike
     def enablePrintButton(self):
-        self.ui.PrintPushButton.setEnabled(True)
+        """Enables the print button if all inputs are occupiedwith value
+
+        """
+        if self.ui.ssnLineEdit.text != '' or self.ui.firstNameLineEdit.text != '' or self.ui.lastNameLineEdit != '': self.ui.printPushButton.setEnabled(True)
 
 
     # Virheilmoitusikkuna
     def openErrorMsgBox(self, errorTitle, errorText):
+        """Opens a message box alerting about an error 
+
+        Args:
+            errorTitle (str): Title to the message box 
+            errorText (str): What kind of an error has occured
+        """
         msgBox = QtWidgets.QMessageBox()
         msgBox.setIcon(QtWidgets.QMessageBox.Critical)
         msgBox.setWindowTitle(errorTitle)
@@ -106,30 +108,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msgBox.exec()
 
-    # Yleispätevän elementin siistimimetofi
-    def beautifyElement(self, e):
-         elementText = e.text()
-         elementText = elementText.strip()
-         elementText = elementText.title()
-         e.setText(elementText)
+    # TODO: Lisää tilariville tiedot asiakkaasta tyyliin
+    def updateStatusbar(self, textToShow, timeToShow = -1):
+        """_summary_
 
-    def enablePrintButton(self):
-        if self.ui.ssnLineEdit.text != '' and self.ui.firstNameLineEdit.text != '' or self.ui.lastNameLineEdit != '':
-            self.ui.PrintPushButton.setEnabled(True)
-
-    # TODO:Lisää tilariville tiedot asiakkaasta tyyliin
+        Args:
+            textToShow (str): A text to show on statusbar
+            timeToShow (int): duration of message in ms. Defaults to -1.
+        """
+        self.ui.statusbar.showMessage(textToShow, timeToShow)
     # "Asiakas on 96 vuotias nainen"
 if __name__ == "__main__":
 
-    # Luodaan sovellus
-    app = QtWidgets.QApplication(sys.argv)
+        # Luodaan sovellus, jossa on käyttöjärjestelmästä riippumaton ulkonäkö (Fusion)
+        app = QtWidgets.QApplication(sys.argv)
+        app.setStyle('Fusion')
 
-    # Luodaan objekti pääikkunalle ja tehdään siitä näkyvä
-    window = MainWindow()
-    window.show()
+        # Luodaan objekti pääikkunalle ja tehdään siitä näkyvä
+        window = MainWindow()
+        window.show()
 
-    # Käynnistetään sovellus ja tapahtumienkäsittelijä
-    app.exec()
+        # Käynnistetään sovellus ja tapahtumienkäsittelijä
+        app.exec()
 
-    
     
